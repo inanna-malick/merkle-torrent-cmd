@@ -1,21 +1,7 @@
-resolver: lts-8.11
-compiler: ghcjs-0.2.1.9008011_ghc-8.0.2
-compiler-check: match-exact
-
+resolver: lts-13.8
 packages:
- - '.'
+- .
+
 extra-deps:
- - aeson-1.1.1.0
- - miso-0.18.0.0
- - text-1.2.3.1
- - ghcjs-dom-0.9.4.0@sha256:c2b3d25145e24b66a8a5078c0d750305b577aeff05957cf282d74f6e8d2424dd
- - ghcjs-dom-jsffi-0.9.4.0@sha256:f5d837577b54605967d4f8877996965ed3a9a9921d07382fcb62ddd0617f5290
- - jsaddle-0.9.6.0@sha256:03b3792794759587c69dd93c79a3f743e0b4032a3617c38f7841f8e16327e013
- - github: pkinsky/merkle-schemes
-   commit: 9c7f8a997bf9d15f71317a86eed7bfc6de3d0e2c
-setup-info:
-  ghcjs:
-    source:
-      ghcjs-0.2.1.9008011_ghc-8.0.2:
-        url: https://github.com/matchwood/ghcjs-stack-dist/raw/master/ghcjs-0.2.1.9008011.tar.gz
-        sha1: a72a5181124baf64bcd0e68a8726e65914473b3b
+- github: pkinsky/merkle-schemes
+  commit: 49a44b971bf03a2495dbc02937b41bc62242777e
