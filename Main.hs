@@ -37,17 +37,20 @@ import qualified Data.ByteString as B
 import qualified System.Directory as Dir
 
 
+infura :: IPFSNode
+infura = IPFSNode "https://ipfs.infura.io" 5001
+
 main :: IO ()
 main = parse >>= \case
   MkReleaseFromDir fp -> do
-    let store = ipfsStore' eitherDecode encode True localHost :: Store IO BitTorrent
+    let store = ipfsStore infura :: Store IO BitTorrent
     hash <- mkRelease store fp
     putStr $ "Release Hash: " ++ show hash
 
   MkTorrentFromDir meta fp -> do
     files <- readFiles fp
     putStrLn "got files"
-    let store = ipfsStore' eitherDecode encode True localHost :: Store IO BitTorrent
+    let store = ipfsStore infura :: Store IO BitTorrent
     torrent <- mkTorrentLazy store meta files
     hash <- sPut store torrent
     putStr $ "Torrent Hash: " ++ show hash
