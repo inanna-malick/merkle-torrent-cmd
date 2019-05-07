@@ -43,14 +43,14 @@ infura = IPFSNode "https://ipfs.infura.io" 5001
 main :: IO ()
 main = parse >>= \case
   MkReleaseFromDir fp -> do
-    let store = ipfsStore localhost :: Store IO BitTorrent
+    let store = ipfsStore localHost :: Store IO BitTorrent
     hash <- mkRelease store fp
     putStr $ "Release Hash: " ++ show hash
 
   MkTorrentFromDir meta fp -> do
     files <- readFiles fp
     putStrLn "got files"
-    let store = ipfsStore localhost :: Store IO BitTorrent
+    let store = ipfsStore localHost :: Store IO BitTorrent
     torrent <- mkTorrentLazy store meta files
     hash <- sPut store torrent
     putStr $ "Torrent Hash: " ++ show hash
