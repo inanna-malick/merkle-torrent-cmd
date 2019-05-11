@@ -42,15 +42,15 @@ infura = IPFSNode "https://ipfs.infura.io" 5001
 
 main :: IO ()
 main = parse >>= \case
-  MkReleaseFromDir fp -> do
-    let store = ipfsStore localHost :: Store IO BitTorrent
+  (node, MkReleaseFromDir fp) -> do
+    let store = ipfsStore node :: Store IO BitTorrent
     hash <- mkRelease store fp
     putStr $ "Release Hash: " ++ show hash
 
-  MkTorrentFromDir meta fp -> do
+  (node, MkTorrentFromDir meta fp) -> do
     files <- readFiles fp
     putStrLn "got files"
-    let store = ipfsStore localHost :: Store IO BitTorrent
+    let store = ipfsStore node :: Store IO BitTorrent
     torrent <- mkTorrentLazy store meta files
     hash <- sPut store torrent
     putStr $ "Torrent Hash: " ++ show hash
@@ -143,7 +143,7 @@ mkRelease store path = do
 
 -- | CMD PARSER STUFF
 
-parse :: IO Cmd
+parse :: IO (IPFSNode, Cmd)
 parse = execParser opts
   where
     opts = info (parser <**> helper)
@@ -151,8 +151,32 @@ parse = execParser opts
      <> progDesc "torrent gen tool"
      <> header "hgit - an implementation of core git/mercurial features using recursion schemes" )
 
-parser :: Parser Cmd
-parser = subparser
+
+parser :: Parser (IPFSNode, Cmd)
+parser = (,) <$> ipfsNodeParser <*> cmdParser
+
+ipfsNodeParser :: Parser IPFSNode
+ipfsNodeParser = IPFSNode
+             <$> strOption
+                ( long "host"
+               <> short 'h'
+               <> metavar "IPFS-DAEMON-HOST"
+               <> showDefault
+               <> value (host localHost)
+               <> help "ipfs daemon host"
+                )
+            <*> option auto
+                ( long "port"
+               <> short 'p'
+               <> metavar "IPFS-DAEMON-HOST"
+               <> showDefault
+               <> value (port localHost)
+               <> help "ipfs daemon port"
+                )
+
+
+cmdParser :: Parser Cmd
+cmdParser = subparser
        ( command "torrent" (info mkT ( progDesc "make a torrent from a directory"))
       <> command "release" (info mkR ( progDesc "cut a release from a dir (finicky format)"))
        )
@@ -173,7 +197,6 @@ parser = subparser
           ( metavar "ROOT PATH"
          <> help "path to ingest to build release"
           )
-
 
 data Cmd = MkTorrentFromDir T.Text FilePath -- todo ipfs daemon info too
          | MkReleaseFromDir FilePath
